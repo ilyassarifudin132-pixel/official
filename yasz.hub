@@ -1,0 +1,139 @@
+--[[
+    YASZ HUB | Steal an Egg Ultra
+    Optimized for Delta Executor
+]]
+
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/X활동/Rayfield/main/Source"))()
+
+local Window = Library:CreateWindow({
+   Name = "🥚 YASZ HUB | Steal an Egg Ultra",
+   LoadingTitle = "Memuat Yasz Hub...",
+   LoadingSubtitle = "Sistem Anti-Deteksi & Auto-Farm",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "YaszHub_StealEgg",
+      FileName = "Config"
+   },
+   KeySystem = false
+})
+
+-- Variabel
+local AutoStealPlayer = false
+local AutoStealEvent = false
+local StayInSafeZone = false
+local EggFilterValue = "All"
+
+local MainTab = Window:CreateTab("🏠 Farm Utama", 4483362458)
+local PlayerTab = Window:CreateTab("👤 Player & Event", 4483362458)
+local SettingTab = Window:CreateTab("⚙️ Pengaturan", 4483362458)
+
+local SafeSection = MainTab:CreateSection("🛡️ Zona Aman & Pengambilan")
+
+SafeSection:CreateToggle({
+   Name = "🟢 ATIVAR STAY IN SAFE ZONE (Neon)",
+   CurrentValue = false,
+   Flag = "SafeZoneToggle", 
+   Callback = function(Value)
+      StayInSafeZone = Value
+      spawn(function()
+         while StayInSafeZone do
+            local safeZonePos = game.Workspace:FindFirstChild("SafeZone") or game.Workspace.SpawnLocation
+            if safeZonePos then
+               game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = safeZonePos.CFrame
+            end
+            wait(0.5)
+         end
+      end)
+   end
+})
+
+SafeSection:CreateToggle({
+   Name = "🟢 ATIVAR AUTO-STEAL PLAYER (Neon)",
+   CurrentValue = false,
+   Flag = "StealPlayerToggle", 
+   Callback = function(Value)
+      AutoStealPlayer = Value
+      spawn(function()
+         while AutoStealPlayer do
+            for _, player in pairs(game.Players:GetPlayers()) do
+               if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild("Egg") then
+                  local oldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+                  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame
+                  wait(0.1)
+                  if StayInSafeZone then
+                     local safeZonePos = game.Workspace:FindFirstChild("SafeZone") or game.Workspace.SpawnLocation
+                     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = safeZonePos.CFrame
+                  end
+               end
+            end
+            wait(1)
+         end
+      end)
+   end
+})
+
+local EventSection = PlayerTab:CreateSection("📅 Event & Egg Filter")
+
+EventSection:CreateToggle({
+   Name = "🟢 ATIVAR AUTO-EVENT STEAL (Neon)",
+   CurrentValue = false,
+   Flag = "EventToggle", 
+   Callback = function(Value)
+      AutoStealEvent = Value
+      spawn(function()
+         while AutoStealEvent do
+            for _, v in pairs(game.Workspace:GetDescendants()) do
+               if (v.Name == "EventEgg" or v.Name == "SpecialEgg") then
+                  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
+                  wait(0.2)
+               end
+            end
+            wait(1)
+         end
+      end)
+   end
+})
+
+EventSection:CreateDropdown({
+   Name = "🥚 Egg Filter (Pilih Telur)",
+   Options = {"All", "Rare", "Epic", "Legendary", "Event"},
+   CurrentOption = {"All"}, 
+   MultipleOptions = false, 
+   Flag = "EggFilterDropdown", 
+   Callback = function(Value)
+      EggFilterValue = Value[1]
+   end
+})
+
+local ModSection = SettingTab:CreateSection("⚡ Pengaturan Karakter")
+
+ModSection:CreateButton({
+   Name = "🔴 DESATIVAR TUDO (Reset)",
+   Callback = function()
+      AutoStealPlayer = false
+      AutoStealEvent = false
+      StayInSafeZone = false
+      game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+   end
+})
+
+ModSection:CreateSlider({
+   Name = "Speed Hack",
+   Range = {16, 500},
+   Increment = 1,
+   Suffix = "Velocidade",
+   CurrentValue = 16,
+   Flag = "SpeedSlider",
+   Callback = function(Value)
+      game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
+   end
+})
+
+Library:Notify({
+   Title = "YASZ HUB AKTIF!",
+   Content = "Script berhasil dimuat via Loadstring!",
+   Duration = 5,
+   Image = 4483362458,
+   Calar = Color3.fromRGB(0, 255, 0) 
+})
+  
